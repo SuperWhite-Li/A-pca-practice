@@ -22,10 +22,10 @@ class PCA:
         """
         # 步骤1: 数据中心化
         self.mean_ = X.mean(axis=0)
-        X_centered = X - self.mean_  # noqa: F401
+        X_centered = X - self.mean_
 
         # 步骤2: 计算协方差矩阵
-        # TODO: 在这里编写计算协方差矩阵的代码
+        C = X_centered.T @ X_centered / (X_centered.shape[0] - 1)  # noqa: F401
 
         # 步骤3: 特征分解协方差矩阵
         # TODO: 在这里编写特征分解的代码

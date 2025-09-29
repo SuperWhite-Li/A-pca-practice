@@ -49,10 +49,10 @@ class PCA:
         X_centered = X - self.mean_
 
         # 步骤6: 投影到主成分上
-        # TODO: 编写数据投影的代码
+        X_PCA = self.components_ @ X_centered
 
         # 返回降维后的数据
-        pass  # 暂时用pass占位
+        return X_PCA
 
     # --- 测试我们的类 ---
     if __name__ == "__main__":

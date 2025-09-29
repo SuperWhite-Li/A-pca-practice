@@ -1,6 +1,7 @@
 # pca.py
 
-import numpy as np # noqa: F401
+import numpy as np  # noqa: F401
+
 
 class PCA:
     def __init__(self, n_components):
@@ -10,9 +11,9 @@ class PCA:
         n_components (int): 我们想要保留的主成分数量 (即降维后的维度).
         """
         self.n_components = n_components
-        self.components_ = None # 将用来存储主成分 (特征向量)
-        self.mean_ = None       # 将用来存储训练数据的均值
-    
+        self.components_ = None  # 将用来存储主成分 (特征向量)
+        self.mean_ = None  # 将用来存储训练数据的均值
+
     def fit(self, X):
         """
         核心训练方法. 它将学习数据的主成分.
@@ -20,7 +21,8 @@ class PCA:
         X (np.ndarray): 训练数据, 形状为 (n_samples, n_features)
         """
         # 步骤1: 数据中心化
-        # TODO: 在这里编写中心化的代码
+        self.mean_ = X.mean(axis=0)
+        X_centered = X - self.mean_  # noqa: F401
 
         # 步骤2: 计算协方差矩阵
         # TODO: 在这里编写计算协方差矩阵的代码
@@ -33,7 +35,7 @@ class PCA:
 
         # fit方法通常返回self, 这是一个惯例
         return self
-    
+
     def transform(self, X):
         """
         使用已学习的主成分来对新数据进行降维.
@@ -47,7 +49,7 @@ class PCA:
         # TODO: 编写数据投影的代码
 
         # 返回降维后的数据
-        pass # 暂时用pass占位
+        pass  # 暂时用pass占位
 
     # --- 测试我们的类 ---
     if __name__ == "__main__":

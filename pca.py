@@ -46,7 +46,7 @@ class PCA:
         X (np.ndarray): 需要被转换的数据, 形状为 (n_samples, n_features)
         """
         # 步骤5: 数据中心化
-        # TODO: 用训练时计算的均值来中心化数据
+        X_centered = X - self.mean_
 
         # 步骤6: 投影到主成分上
         # TODO: 编写数据投影的代码

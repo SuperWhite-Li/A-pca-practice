@@ -31,7 +31,11 @@ class PCA:
         eigenvalues, eigenvectors = np.linalg.eig(C)
 
         # 步骤4: 存储所需的主成分和均值
-        # TODO: 在这里编写存储结果的代码
+        sorted_indices = np.argsort(eigenvalues)[::-1]
+        sorted_eigenvalues = eigenvalues[sorted_indices][
+            : self.n_components + 1
+        ]  # noqa: F401
+        self.components_ = eigenvectors[sorted_indices][: self.n_components + 1]
 
         # fit方法通常返回self, 这是一个惯例
         return self

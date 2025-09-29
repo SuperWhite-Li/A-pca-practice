@@ -13,6 +13,7 @@ class PCA:
         self.n_components = n_components
         self.components_ = None  # 将用来存储主成分 (特征向量)
         self.mean_ = None  # 将用来存储训练数据的均值
+        self.eigenvalues_ = None  # 初始化特征值属性
 
     def fit(self, X):
         """
@@ -25,14 +26,16 @@ class PCA:
         X_centered = X - self.mean_
 
         # 步骤2: 计算协方差矩阵
-        C = X_centered.T @ X_centered / (X_centered.shape[0] - 1)
+        # rowvar=False 告诉 np.cov() 每一列是一个变量(特征), 每一行是一个观测(样本)
+        # 这正是我们数据的组织方式
+        C = np.cov(X_centered, rowvar=False)
 
         # 步骤3: 特征分解协方差矩阵
         eigenvalues, eigenvectors = np.linalg.eig(C)
 
         # 步骤4: 存储所需的主成分和均值
         sorted_indices = np.argsort(eigenvalues)[::-1]
-        sorted_eigenvalues = eigenvalues[sorted_indices]  # noqa: F401
+        self.eigenvalues_ = eigenvalues[sorted_indices]  # noqa: F401
         sorted_eigenvectors = eigenvectors[:, sorted_indices]
         self.components_ = sorted_eigenvectors[:, : self.n_components]
 
@@ -49,12 +52,84 @@ class PCA:
         X_centered = X - self.mean_
 
         # 步骤6: 投影到主成分上
-        X_PCA = self.components_ @ X_centered
+        X_PCA = X_centered @ self.components_
 
         # 返回降维后的数据
         return X_PCA
 
-    # --- 测试我们的类 ---
-    if __name__ == "__main__":
-        # 我们将在后续步骤中在这里编写测试代码
-        print("PCA class structure created.")
+    def fit_transform(self, X):
+        """
+        方便的方法, 结合了fit和transform
+        """
+        self.fit(X)
+        return self.transform(X)
+
+
+# --- 测试我们的类 ---
+if __name__ == "__main__":
+    # 1. 创建一个我们"知道"答案的玩具数据集
+    # 我们将从一个标准正态分布的点云开始
+    np.random.seed(42)
+    X_raw = np.random.randn(100, 2)  # 100个样本, 2个特征
+
+    # 然后, 我们对它进行一次"拉伸"和"旋转"
+    # 这会创造出一个方差最大的方向(主成分)
+    # 这个方向应该是 [1, 1] 经过旋转后的方向
+    theta = np.radians(30)
+    R = np.array([[np.cos(theta), -np.sin(theta)], [np.sin(theta), np.cos(theta)]])
+    S = np.array([[5, 0], [0, 1]])  # 延x轴拉伸5倍, y轴不变
+    X = X_raw @ S @ R
+
+    print("--- 自动化测试开始 ---")
+    print(f"原始数据形状: {X.shape}")
+
+    # 2. 初始化并训练我们的PCA模型
+    # 我们想把它降到1维
+    pca = PCA(n_components=1)
+    pca.fit(X)
+
+    # 3. 检查学习到的属性
+    print(f"\n学习到的均值 (self.mean_):\n{pca.mean_}")
+    print(f"\n学习到的主成分 (self.components_):\n{pca.components_}")
+    # 理论上, 第一个主成分应该是一个指向30度方向的向量 [cos(30), sin(30)]
+    # 即大约 [0.865, 0.5]
+    print("(理论上的第一主成分方向应接近 [0.865, 0.5] 或其相反方向)")
+
+    # 4. 对数据进行降维 (transform)
+    X_transformed = pca.transform(X)
+
+    print(f"\n降维后的数据形状: {X_transformed.shape}")
+    print(f"降维后数据的前5行:\n{X_transformed[:5]}")
+
+    # 5. 可视化结果，这是最有说服力的验证!
+    import matplotlib.pyplot as plt
+
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
+
+    # 子图1: 原始数据和主成分方向
+    ax1.scatter(X[:, 0], X[:, 1], alpha=0.5, label="Original Data")
+    # 绘制学习到的主成分方向
+    # 我们从均值点出发, 画出主成分向量
+    assert pca.components_ and pca.eigenvalues_ is not None
+    arrow_vec = pca.components_[:, 0] * np.sqrt(pca.eigenvalues_[0]) * 3
+    start_point = pca.mean_
+    end_point = pca.mean_ + arrow_vec
+    ax1.annotate(
+        "",
+        xy=end_point,
+        xytext=start_point,
+        arrowprops=dict(arrowstyle="->", color="red", lw=2),
+        label="First Principal Component",
+    )
+    ax1.set_title("Original Data with Principal Component")
+    ax1.set_aspect("equal", adjustable="box")
+    ax1.grid(True)
+    ax1.legend()
+
+    # 子图2: 降维后的一维数据
+    ax2.hist(X_transformed, bins=20, alpha=0.7)
+    ax2.set_title("Transformed Data (1 Dimension)")
+    ax2.grid(True)
+
+    plt.tight_layout()
+    plt.show()

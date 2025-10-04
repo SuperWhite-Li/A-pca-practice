@@ -33,7 +33,7 @@ venv/
 ENV/
 env.bak/
 venv.bak/
-pca_env/ # <-- 把你的环境文件夹加进去
+pca_env/
 
 # IDE / Editor specific files
 .vscode/

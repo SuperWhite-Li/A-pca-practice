@@ -102,6 +102,9 @@ if __name__ == "__main__":
     print(f"降维后数据的前5行:\n{X_transformed[:5]}")
 
     # 5. 可视化结果，这是最有说服力的验证!
+    import matplotlib
+
+    matplotlib.use("TkAgg")  # 或者 'Qt5Agg'
     import matplotlib.pyplot as plt
 
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
@@ -110,7 +113,7 @@ if __name__ == "__main__":
     ax1.scatter(X[:, 0], X[:, 1], alpha=0.5, label="Original Data")
     # 绘制学习到的主成分方向
     # 我们从均值点出发, 画出主成分向量
-    assert pca.components_ and pca.eigenvalues_ is not None
+    assert pca.components_ is not None and pca.eigenvalues_ is not None
     arrow_vec = pca.components_[:, 0] * np.sqrt(pca.eigenvalues_[0]) * 3
     start_point = pca.mean_
     end_point = pca.mean_ + arrow_vec

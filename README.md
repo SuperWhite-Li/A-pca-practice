@@ -26,7 +26,7 @@
 
 1.  **克隆并进入项目**:
     ```bash
-    git clone <your-repo-link>
+    git clone https://github.com/SuperWhite-Li/A-pca-practice.git
     cd pca-from-scratch
     ```
 2.  **创建并激活Conda环境**:

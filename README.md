@@ -42,7 +42,7 @@
     预期输出应为 `4 passed`。
 4.  **运行可视化验证**:
     ```bash
-    python test_pca.py
+    python visualize_pca.py
     ```
     将会显示一个包含原始数据分布和降维后结果的图表。
 
